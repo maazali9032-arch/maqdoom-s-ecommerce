@@ -59,11 +59,11 @@ export default async function HomePage() {
                 Premium Indian menswear, fine fabrics and bespoke tailoring — crafted for every chapter of your life.
               </p>
               <div className="hero-actions">
-                <Link href="/shop" className="btn-primary">
+                <Link href="/shop" className="btn-primary" id="exploreCollectionBtn">
                   <span>Explore Collection</span>
                   <span className="btn-arrow">&rarr;</span>
                 </Link>
-                <Link href="/mahib" className="btn-outline">
+                <Link href="/mahib" className="btn-outline" id="watchFilmBtn">
                   <span>Discover MAHIB</span>
                 </Link>
               </div>

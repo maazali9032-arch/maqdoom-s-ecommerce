@@ -19,11 +19,13 @@ export async function generateMetadata({ params }: PageProps<"/product/[slug]">)
   if (!p) return {};
   const image = imageUrl(p.thumbnail ?? p.images[0], "large");
   const description = p.seo_description || p.description?.slice(0, 160) || `${p.title} at ${SITE_NAME}.`;
+  // The layout adds " | MAQDOOM'S BIG MALL"; drop it if staff or AI already typed the store name.
+  const title = (p.seo_title || p.title).replace(/\s*[|\-–—:]\s*maqdoom['’]?s(\s+big\s+mall)?\s*$/i, "").trim() || p.title;
   return {
-    title: p.seo_title || p.title,
+    title,
     description,
     alternates: { canonical: `/product/${p.slug}` },
-    openGraph: { title: p.seo_title || p.title, description, images: image ? [{ url: image, width: 1600, height: 2000 }] : [] },
+    openGraph: { title, description, images: image ? [{ url: image, width: 1600, height: 2000 }] : [] },
   };
 }
 
@@ -68,6 +70,13 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
             <Suspense fallback={panel(product, true)}>
               <LivePanel slug={product.slug} render={panel} />
             </Suspense>
+            {product.highlights?.length ? (
+              <ul className="sf-highlights" aria-label="Highlights">
+                {product.highlights.map((h) => (
+                  <li key={h}>{h}</li>
+                ))}
+              </ul>
+            ) : null}
             {product.description ? (
               <div className="sf-product-desc">
                 {product.description.split(/\n{2,}/).map((para, i) => (
@@ -75,13 +84,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
                 ))}
               </div>
             ) : null}
-            {product.tags.length ? (
-              <ul className="sf-tags" aria-label="Tags">
-                {product.tags.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            ) : null}
+            {/* Tags are not shown: they feed search and the structured data below. */}
           </div>
         </div>
       </div>
@@ -127,6 +130,10 @@ function jsonLd(p: Product, url: string, image?: string) {
     image: image ? [image] : undefined,
     brand: { "@type": "Brand", name: SITE_NAME },
     category: p.category.name,
+    keywords: p.tags.length ? p.tags.join(", ") : undefined,
+    additionalProperty: p.highlights?.length
+      ? p.highlights.map((h) => ({ "@type": "PropertyValue", name: "Highlight", value: h }))
+      : undefined,
     url,
     offers,
   };

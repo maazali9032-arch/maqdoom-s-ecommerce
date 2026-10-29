@@ -40,6 +40,8 @@ export type Product = ProductCard & {
   description: string | null;
   images: string[];
   tags: string[];
+  /** Short bullet list (empty until staff add some; missing before ERP migration 20261030000800). */
+  highlights?: string[];
   seo_title: string;
   seo_description: string | null;
   sizes: SizeOption[];

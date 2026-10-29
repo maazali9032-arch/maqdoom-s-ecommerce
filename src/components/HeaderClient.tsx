@@ -1,14 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export type NavItem = { href: string; label: string; mahib?: boolean };
+
+/** "Shop All" only on /shop itself; MAHIB and categories also on their sub-pages. */
+function isActive(href: string, path: string) {
+  if (href.includes("#")) return false;
+  if (href === "/shop") return path === "/shop";
+  return path === href || path.startsWith(`${href}/`);
+}
 
 /** Scroll shadow and the mobile menu drawer (classes from the original design). */
 export function HeaderClient({ nav, whatsappHref }: { nav: NavItem[]; whatsappHref: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const path = usePathname();
+  const cls = (item: NavItem) =>
+    `nav-link${item.mahib ? " nav-link-mahib" : ""}${isActive(item.href, path) ? " active" : ""}`;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -34,7 +45,12 @@ export function HeaderClient({ nav, whatsappHref }: { nav: NavItem[]; whatsappHr
           </Link>
           <nav className="main-nav" aria-label="Primary Navigation">
             {nav.map((item) => (
-              <Link key={item.href} href={item.href} className={`nav-link${item.mahib ? " nav-link-mahib" : ""}`}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cls(item)}
+                aria-current={isActive(item.href, path) ? "page" : undefined}
+              >
                 {item.label}
               </Link>
             ))}
@@ -78,7 +94,8 @@ export function HeaderClient({ nav, whatsappHref }: { nav: NavItem[]; whatsappHr
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`nav-link${item.mahib ? " nav-link-mahib" : ""}`}
+                  className={cls(item)}
+                  aria-current={isActive(item.href, path) ? "page" : undefined}
                   onClick={() => setOpen(false)}
                 >
                   {item.label}

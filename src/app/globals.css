@@ -80,3 +80,50 @@
   .sf-product-grid { grid-template-columns: 1fr; }
   .sf-product-info { position: static; }
 }
+
+/* Refinements (29 Oct 2026) ------------------------------------------------ */
+
+/* Menu: the underline follows the current page; MAHIB keeps its bold gold accent. */
+.nav-link-mahib::after { width: 0%; }
+.nav-link-mahib:hover::after, .nav-link-mahib.active::after { width: 100%; }
+
+/* Cards: titles stop at two lines. */
+.product-title {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2;
+  overflow: hidden;
+}
+@media (max-width: 640px) {
+  .product-title { font-size: 0.8rem; letter-spacing: 0.02em; }
+  .product-details { padding: 0.85rem 0.75rem; }
+  .product-price { font-size: 0.88rem; }
+}
+
+/* Product page */
+.sf-highlights { list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: 0.55rem; }
+.sf-highlights li { position: relative; padding-left: 1.25rem; font-size: 0.92rem; color: var(--text-primary); line-height: 1.45; }
+.sf-highlights li::before {
+  content: ""; position: absolute; left: 0; top: 0.5em; width: 0.45rem; height: 0.45rem;
+  border: 1.5px solid var(--color-gold-rich); transform: rotate(45deg);
+}
+.sf-product-desc { font-size: 1.05rem; }
+@media (max-width: 860px) {
+  .sf-product-title { font-size: 1.35rem; letter-spacing: 0.03em; margin-bottom: 0.5rem; }
+  .sf-product-desc { font-size: 1rem; line-height: 1.55; }
+  .sf-product { padding-bottom: 6rem; } /* room for the sticky order bar */
+}
+
+/* Sticky order bar: phones only */
+.sf-order-bar { display: none; }
+@media (max-width: 860px) {
+  .sf-order-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.65rem 1rem calc(0.65rem + env(safe-area-inset-bottom));
+    background: rgba(253, 251, 247, 0.97); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--color-ivory-sand); box-shadow: 0 -6px 20px rgba(20, 17, 14, 0.08);
+  }
+  .sf-order-bar-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+  .sf-order-bar-title { font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sf-order-bar-price { font-size: 0.95rem; font-weight: 700; }
+  .sf-order-bar-btn { flex: none; padding: 0.8rem 1.1rem; font-size: 0.78rem; }
+}

@@ -1,26 +1,82 @@
-@import "tailwindcss";
+/* Storefront additions on top of design.css (same tokens, same look). */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Photos are cropped 4:5 in the ERP, so cards use exactly 4:5. */
+.product-media-box { padding-top: 125%; }
+.product-card-link { display: flex; flex-direction: column; flex-grow: 1; color: inherit; text-decoration: none; }
+.product-card-link:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 3px; }
+.product-soldout-tag {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--color-ivory); color: var(--color-espresso);
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.25rem 0.55rem; border-radius: var(--radius-xs);
+}
+.sf-empty {
+  padding: 3rem 1rem; text-align: center; color: var(--text-muted);
+  font-family: var(--font-serif-editorial); font-size: 1.25rem; font-style: italic;
+  border: 1px dashed var(--color-taupe-light); border-radius: var(--radius-xs);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Listing pages */
+.sf-page-head { padding: clamp(2.5rem, 6vh, 4.5rem) 0 1.5rem; background: var(--color-ivory-warm); }
+.sf-breadcrumb { display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5rem; }
+.sf-breadcrumb a { color: inherit; text-decoration: none; }
+.sf-breadcrumb a:hover { color: var(--color-gold-deep); }
+.sf-page-title { font-family: var(--font-serif-display); font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 600; letter-spacing: 0.06em; line-height: 1.1; margin: 0.25rem 0 0.75rem; }
+.sf-page-intro { max-width: 60ch; color: var(--text-secondary); font-family: var(--font-serif-editorial); font-size: 1.2rem; }
+.sf-chips { display: flex; gap: 0.5rem; overflow-x: auto; padding: 1.75rem 0 0.25rem; scrollbar-width: none; }
+.sf-chips::-webkit-scrollbar { display: none; }
+.sf-chip {
+  flex: none; padding: 0.55rem 1.1rem; border: 1px solid var(--color-taupe-light); border-radius: var(--radius-pill);
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-secondary); text-decoration: none; background: var(--color-ivory); transition: all var(--transition-fast);
 }
+.sf-chip:hover { border-color: var(--color-gold); color: var(--color-espresso); }
+.sf-chip.active { background: var(--color-espresso); border-color: var(--color-espresso); color: var(--color-ivory); }
+.sf-listing-grid { border-top: none; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* MAHIB pages use the dark espresso + gold palette */
+.sf-listing-mahib .sf-page-head { background: var(--color-espresso); color: var(--text-light); }
+.sf-listing-mahib .sf-page-intro { color: var(--text-light-muted); }
+.sf-listing-mahib .sf-chip { background: transparent; border-color: var(--color-espresso-border); color: var(--text-light-muted); }
+.sf-listing-mahib .sf-chip.active { background: var(--color-gold); border-color: var(--color-gold); color: var(--color-espresso); }
+.sf-listing-mahib .sf-page-title { color: var(--color-gold-light); }
+
+/* Product page */
+.sf-product { padding: clamp(1.5rem, 4vh, 3rem) 0 clamp(3rem, 8vh, 5rem); }
+.sf-product-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: start; }
+.sf-gallery { display: flex; flex-direction: column; gap: 0.75rem; }
+.sf-gallery-main { aspect-ratio: 4 / 5; background: #EDE8E1; border-radius: var(--radius-xs); overflow: hidden; }
+.sf-gallery-main img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sf-gallery-thumbs { display: flex; gap: 0.5rem; overflow-x: auto; }
+.sf-thumb { flex: none; width: 72px; aspect-ratio: 4 / 5; padding: 0; border: 1px solid var(--color-ivory-sand); border-radius: var(--radius-xs); overflow: hidden; cursor: pointer; background: none; opacity: 0.7; transition: all var(--transition-fast); }
+.sf-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sf-thumb:hover, .sf-thumb.active { opacity: 1; border-color: var(--color-gold); }
+.sf-product-info { position: sticky; top: calc(var(--header-height) + 1.5rem); }
+.sf-product-title { font-family: var(--font-serif-display); font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 600; letter-spacing: 0.04em; line-height: 1.2; margin: 0.25rem 0 1rem; }
+.sf-order { display: flex; flex-direction: column; gap: 1rem; padding: 1.25rem 0; border-top: 1px solid var(--color-ivory-sand); border-bottom: 1px solid var(--color-ivory-sand); }
+.sf-order-price { font-size: 1.35rem; font-weight: 700; }
+.sf-order-note { font-size: 0.85rem; color: var(--text-muted); }
+.sf-order-btn { width: 100%; }
+.sf-order-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.sf-order-btn-dark { border: 1px solid var(--color-espresso); }
+.sf-sizes { border: none; padding: 0; margin: 0; }
+.sf-sizes legend { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.6rem; }
+.sf-size-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.sf-size {
+  min-width: 3rem; padding: 0.6rem 0.9rem; border: 1px solid var(--color-taupe-light); border-radius: var(--radius-xs);
+  background: #fff; font: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all var(--transition-fast);
 }
+.sf-size:hover:not(:disabled) { border-color: var(--color-gold); }
+.sf-size.active { background: var(--color-espresso); border-color: var(--color-espresso); color: var(--color-ivory); }
+.sf-size:disabled { color: var(--text-muted); text-decoration: line-through; cursor: not-allowed; background: var(--color-ivory-warm); }
+.sf-left { margin-top: 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--color-gold-deep); }
+.sf-product-desc { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem; font-family: var(--font-serif-editorial); font-size: 1.15rem; color: var(--text-secondary); line-height: 1.6; }
+.sf-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; padding: 0; margin-top: 1.25rem; }
+.sf-tags li { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.6rem; background: var(--color-ivory-warm); border-radius: var(--radius-xs); color: var(--text-secondary); }
+.sf-not-found { padding: clamp(4rem, 14vh, 8rem) 0; text-align: left; }
+.sf-not-found .hero-actions { margin-top: 2rem; }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (max-width: 860px) {
+  .sf-product-grid { grid-template-columns: 1fr; }
+  .sf-product-info { position: static; }
 }

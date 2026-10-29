@@ -60,6 +60,7 @@ export class WovenEngine {
   private lastTap = { t: 0, x: 0, y: 0 };
   private hover: { x: number; y: number } | null = null;
   private lastScroll = 0;
+  private lastPull = { x: 0, y: 0 };
   private active = 0;           // time of the last activity; drawing pauses when idle
   private raf = 0;
   private time = 0;
@@ -252,8 +253,7 @@ export class WovenEngine {
       const d = window.scrollY - this.lastScroll;
       this.lastScroll = window.scrollY;
       if (this.mode === 0) this.cloth.ripple(Math.min(1.5, Math.abs(d) * 0.04));
-      this.sound.rustle(Math.min(1, Math.abs(d) / 25), true);
-      this.wake();
+      this.wake(); // no sound on scroll: the cloth only sounds when touched
     }, { passive: true });
 
     this.on("pointermove", (e) => {
@@ -263,7 +263,10 @@ export class WovenEngine {
       if (p && p.id === e.pointerId) {
         if (this.pulling) {
           this.cloth.drag(e.clientX, e.clientY);
-          this.sound.rustle(Math.min(1, Math.hypot(e.movementX, e.movementY) / 30), true);
+          // measure the finger's movement ourselves (phones don't always report movementX/Y)
+          const moved = Math.hypot(e.clientX - this.lastPull.x, e.clientY - this.lastPull.y);
+          this.lastPull = { x: e.clientX, y: e.clientY };
+          this.sound.rustle(Math.min(1, moved / 30), true);
         } else if (Math.hypot(e.clientX - p.x, e.clientY - p.y) > 10) {
           this.cancelHold();
         }
@@ -385,6 +388,7 @@ export class WovenEngine {
     }
     if (!this.pulling) return; // released while capturing
     this.cloth.grab(p.x, p.y);
+    this.lastPull = { x: p.x, y: p.y };
     navigator.vibrate?.(8);
     // the release after a pull must not click whatever is underneath
     const swallow = (e: Event) => {
@@ -396,6 +400,7 @@ export class WovenEngine {
   }
 
   private endPull() {
+    this.sound.rustle(0, true);
     this.pulling = false;
     this.press = null;
     this.cloth.release();

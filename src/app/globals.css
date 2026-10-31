@@ -128,25 +128,3 @@
   .sf-order-bar-btn { flex: none; padding: 0.8rem 1.1rem; font-size: 0.78rem; }
 }
 
-/* ---------- Woven Mode (switched on from the header) ---------- */
-.woven-toggle.on { color: var(--color-gold-rich); }
-.woven-toggle.on svg { filter: drop-shadow(0 0 4px rgba(197, 168, 105, 0.6)); }
-.woven-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 90; pointer-events: none; }
-.woven-canvas.woven-lean { pointer-events: auto; touch-action: none; cursor: grab; }
-.woven-shuttle {
-  position: fixed; top: 0; left: 0; width: 64px; height: 28px; z-index: 95; pointer-events: none;
-  opacity: 0; transition: opacity 0.2s ease; transform-origin: 32px 14px; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
-}
-.woven-shuttle svg { width: 100%; height: 100%; display: block; }
-.woven-weft {
-  position: fixed; top: 0; left: 0; height: 2px; z-index: 94; pointer-events: none; opacity: 0;
-  background: linear-gradient(90deg, rgba(197, 168, 105, 0.15), #C5A869); transition: opacity 0.2s ease;
-}
-.woven-shuttle.on, .woven-weft.on { opacity: 1; }
-.woven-step-back {
-  position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); z-index: 101;
-  transform: translate(-50%, 20px); opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease;
-  border: 1px solid rgba(179, 142, 70, 0.6); background: rgba(251, 247, 239, 0.92); color: #1F1A15;
-  font: 600 12px var(--font-jakarta), system-ui, sans-serif; letter-spacing: 0.08em; padding: 9px 16px; border-radius: 999px;
-}
-.woven-step-back.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }

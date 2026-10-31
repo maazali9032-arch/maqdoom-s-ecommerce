@@ -4,6 +4,7 @@ import { SiteFooter, SiteHeader } from "@/components/SiteChrome";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./design.css";
 import "./globals.css";
+import "./refine.css";
 
 const cinzel = Cinzel({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-cinzel" });
 const cormorant = Cormorant_Garamond({

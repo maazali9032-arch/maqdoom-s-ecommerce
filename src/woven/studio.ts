@@ -1,6 +1,7 @@
-// "Feel the Fabric": one piece of real-feeling cloth inside a full-screen panel.
-// Touch and pull it (mouse or finger); let go and it springs back. "Look closer" shows the weave.
-// Nothing here touches the rest of the site, so browsing stays exactly as fast as before.
+// A piece of real-feeling cloth in a canvas. Used two ways:
+// - the Fabric Studio panel: a woven fabric picture to touch and pull, with "Look closer";
+// - the home hero: a picture of the hero itself, pulled like cloth while a finger holds it.
+// Let go and it springs back.
 
 import { Cloth, FABRICS, type FabricKind } from "./cloth";
 import { Sound } from "./sound";
@@ -33,8 +34,14 @@ export class FabricStudio {
   private off: (() => void)[] = [];
   /** Called the first time the visitor touches the cloth (to hide the hint). */
   onTouch: (() => void) | null = null;
+  /** Called once the cloth has sprung back after being let go. */
+  onSettle: (() => void) | null = null;
+  private picture: HTMLCanvasElement | null = null;
+  private thread: number;
+  private releasedAt = 0;
 
-  constructor(private canvas: HTMLCanvasElement) {
+  constructor(private canvas: HTMLCanvasElement, opts: { thread?: number } = {}) {
+    this.thread = opts.thread ?? 3.4;
     const gl = canvas.getContext("webgl2", { premultipliedAlpha: false, antialias: true });
     if (!gl) throw new Error("WebGL2 unavailable");
     this.gl = gl;
@@ -61,6 +68,28 @@ export class FabricStudio {
     this.cloth.fabric = FABRICS[kind];
     this.paint();
     this.cloth.ripple(3); // a little wave so the new cloth settles in
+    this.wake();
+  }
+
+  /** Use a picture (e.g. the hero) as the cloth instead of a woven fabric swatch. */
+  setPicture(pic: HTMLCanvasElement, kind: FabricKind = "silk") {
+    this.picture = pic;
+    this.kind = kind;
+    this.cloth.fabric = FABRICS[kind];
+    this.paint();
+    this.wake();
+  }
+
+  /** Start pulling from a finger that is already down (the hold began on the page). */
+  pullFrom(pointerId: number, clientX: number, clientY: number) {
+    const r = this.canvas.getBoundingClientRect();
+    const x = clientX - r.left, y = clientY - r.top;
+    this.pointer = { id: pointerId, x, y };
+    this.releasedAt = 0;
+    this.cloth.grab(x, y);
+    this.cloth.drag(x, y);
+    this.sound.enable();
+    navigator.vibrate?.(8);
     this.wake();
   }
 
@@ -131,7 +160,7 @@ export class FabricStudio {
   private paint() {
     if (!this.W) return;
     const gl = this.gl;
-    const pic = paintSwatch(this.kind, Math.round(this.W * this.dpr), Math.round(this.H * this.dpr));
+    const pic = this.picture ?? paintSwatch(this.kind, Math.round(this.W * this.dpr), Math.round(this.H * this.dpr));
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.snap);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, pic);
@@ -161,7 +190,7 @@ export class FabricStudio {
     this.active = performance.now();
   }
 
-  // ---------- input (only on the cloth itself) ----------
+  // ---------- input: press on the cloth; moves and release are followed anywhere ----------
 
   private listen() {
     const c = this.canvas;
@@ -169,6 +198,14 @@ export class FabricStudio {
       c.addEventListener(t, f as EventListener);
       this.off.push(() => c.removeEventListener(t, f as EventListener));
     };
+    const onWin = <K extends keyof WindowEventMap>(t: K, f: (e: WindowEventMap[K]) => void, o?: AddEventListenerOptions) => {
+      window.addEventListener(t, f as EventListener, o);
+      this.off.push(() => window.removeEventListener(t, f as EventListener, o));
+    };
+    // no page scrolling while the cloth is held
+    onWin("touchmove", (e) => {
+      if (this.pointer) e.preventDefault();
+    }, { passive: false });
     const local = (e: PointerEvent) => {
       const r = c.getBoundingClientRect();
       return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -190,7 +227,7 @@ export class FabricStudio {
       navigator.vibrate?.(6);
       this.wake();
     });
-    on("pointermove", (e) => {
+    onWin("pointermove", (e) => {
       const p = this.pointer;
       if (!p || p.id !== e.pointerId) return;
       const q = local(e);
@@ -211,12 +248,13 @@ export class FabricStudio {
     const up = (e: PointerEvent) => {
       if (this.pointer?.id !== e.pointerId) return;
       this.pointer = null;
+      this.releasedAt = performance.now();
       this.cloth.release();
       this.sound.rustle(0, true);
       this.wake();
     };
-    on("pointerup", up);
-    on("pointercancel", up);
+    onWin("pointerup", up);
+    onWin("pointercancel", up);
   }
 
   private clampPan() {
@@ -243,6 +281,11 @@ export class FabricStudio {
     }
 
     // rest when nothing moves (saves battery); the last frame stays on screen
+    if (this.releasedAt && now - this.releasedAt > 750 && this.onSettle) {
+      const f = this.onSettle;
+      this.onSettle = null;
+      f();
+    }
     if (now - this.active > 1800 && !this.pointer) return;
     this.cloth.step();
     this.draw();
@@ -260,7 +303,7 @@ export class FabricStudio {
     gl.uniform2f(this.u("uPan"), this.panX, this.panY);
     gl.uniform1f(this.u("uZoom"), this.zoom);
     gl.uniform1f(this.u("uScroll"), 0);
-    gl.uniform1f(this.u("uThread"), 3.4);
+    gl.uniform1f(this.u("uThread"), this.thread);
     gl.uniform1f(this.u("uFront"), 1e6);
     gl.uniform1f(this.u("uTime"), this.time);
     gl.uniform1f(this.u("uFade"), 0);

@@ -37,7 +37,7 @@
 .drawer-wa { display: flex; justify-content: center; width: 100%; margin-top: 2rem; background: #25D366; border-color: #25D366; color: #fff; }
 
 /* ---------- Feel the Fabric button ---------- */
-.fabric-btn-mobile { display: none; }
+.fabric-btn-short { display: none; }
 .fabric-btn {
   position: relative; overflow: hidden; display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.6rem 1.1rem; border: 1px solid var(--color-gold-rich); border-radius: 999px; cursor: pointer;
@@ -56,8 +56,8 @@
 @keyframes fabric-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.18) rotate(18deg); } }
 @media (prefers-reduced-motion: reduce) { .fabric-btn::after, .fabric-btn-spark { animation: none; } }
 @media (max-width: 860px) {
-  .fabric-btn-desktop { display: none; }
-  .fabric-btn-mobile { display: inline-flex; }
+  .fabric-btn-long { display: none; }
+  .fabric-btn-short { display: inline; }
   .fabric-btn { padding: 0.5rem 0.85rem; font-size: 0.66rem; letter-spacing: 0.1em; }
 }
 
@@ -212,4 +212,29 @@
   .footer-link { font-size: 0.76rem; line-height: 1.3; }
   .footer-bottom-bar { padding-top: 1rem; justify-content: center; text-align: center; }
   .copyright-text { font-size: 0.7rem; }
+}
+
+/* ---------- Fabric switched on: woven site + pullable hero ---------- */
+.fabric-btn.on { background: linear-gradient(135deg, #C5A869, #E7D5AA 50%, #B38E46); color: var(--color-espresso); border-color: var(--color-gold-deep); }
+.fabric-btn.on .fabric-btn-spark { fill: var(--color-espresso); }
+.woven-overlay { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 90; pointer-events: none; transition: opacity 0.2s ease; }
+.woven-on .hero-section { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.woven-on .hero-section img { -webkit-user-drag: none; }
+.hero-cloth { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 30; touch-action: none; transition: opacity 0.3s ease; }
+.hero-cloth-out { opacity: 0; }
+.fabric-toast {
+  position: fixed; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 120;
+  display: flex; align-items: center; gap: 0.9rem; width: max-content; max-width: calc(100vw - 2rem);
+  padding: 0.7rem 0.75rem 0.7rem 1.1rem; border-radius: 999px; border: 1px solid var(--color-gold-rich);
+  background: rgba(20, 17, 14, 0.92); color: var(--color-ivory); font-size: 0.8rem; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  animation: fabric-toast-in 0.4s var(--ease-luxury);
+}
+.fabric-toast strong { color: var(--color-gold-light); }
+.fabric-toast button {
+  flex: none; padding: 0.45rem 0.8rem; border-radius: 999px; border: none; cursor: pointer;
+  background: var(--color-gold); color: var(--color-espresso); font: 600 0.7rem var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase;
+}
+@keyframes fabric-toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (max-width: 640px) {
+  .fabric-toast { border-radius: 14px; flex-direction: column; align-items: stretch; text-align: center; gap: 0.55rem; padding: 0.8rem; width: calc(100vw - 2rem); bottom: calc(76px + env(safe-area-inset-bottom)); }
 }

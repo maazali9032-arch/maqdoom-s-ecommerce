@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCategories, getHomeFeatured, getSettings, type Category } from "@/lib/catalogue";
 import { SITE_NAME, imageUrl, sectionPath, whatsappLink } from "@/lib/site";
 import { HeroCycler } from "@/components/HeroCycler";
+import { CategoryRing } from "@/components/CategoryRing";
 import { HERO_OUTFITS } from "@/lib/hero";
 import { ProductGrid } from "@/components/ProductCard";
 
@@ -116,34 +117,9 @@ export default async function HomePage() {
                 <h2 className="section-title-light">CATEGORIES</h2>
               </div>
             </div>
-            {/* endless loop: the list is shown twice and slides left; the second copy is for looks only */}
-            <div className="categories-carousel-wrap cat-loop">
-              <div className="categories-track cat-loop-track" style={{ ["--cat-dur" as string]: `${Math.max(main.length, 3) * 6}s` }}>
-                {[0, 1].map((copy) =>
-                  main.map((c) => (
-                    <Link
-                      key={`${copy}-${c.slug}`}
-                      href={sectionPath("main", c.slug)}
-                      className="category-card"
-                      aria-hidden={copy === 1 ? true : undefined}
-                      tabIndex={copy === 1 ? -1 : undefined}
-                    >
-                      <div className="category-img-box">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={categoryArt(c)} alt={copy === 1 ? "" : `${c.name} collection`} loading="lazy" />
-                      </div>
-                      <div className="category-info-box">
-                        <div className="cat-text-wrap">
-                          <h3 className="category-name">{c.name.toUpperCase()}</h3>
-                          {c.description ? <span className="category-subtext">{c.description}</span> : null}
-                        </div>
-                        <div className="category-arrow-circle">&rarr;</div>
-                      </div>
-                    </Link>
-                  )),
-                )}
-              </div>
-            </div>
+            <CategoryRing
+              cards={main.map((c) => ({ href: sectionPath("main", c.slug), name: c.name, img: categoryArt(c), desc: c.description }))}
+            />
           </div>
         </section>
       ) : null}

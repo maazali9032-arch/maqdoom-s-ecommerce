@@ -20,6 +20,17 @@ function categoryArt(c: Category) {
   return DESIGN_ART.find(([re]) => re.test(key))?.[1] ?? "/images/section_2_fabrics.webp";
 }
 
+/* Legacy facts. Only true numbers go here (to be confirmed by the owner before going live). */
+const LEGACY = {
+  title: "Dressing Hyderabad’s grooms since 1895.",
+  stats: [
+    { value: "1895", label: "Established" },
+    { value: "130+", label: "Years of craftsmanship" },
+    { value: "4 hrs", label: "Made-to-measure stitching" },
+    { value: "Worldwide", label: "Clients from abroad" },
+  ],
+};
+
 const isFabric = (c: Category) => /fabric|thaan/.test(`${c.slug} ${c.name}`.toLowerCase());
 
 export default async function HomePage() {
@@ -124,15 +135,73 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* 3. BENEFITS */}
-      <section className="benefits-section" aria-label="Why MAQDOOM'S">
-        <div className="container">
-          <div className="benefits-grid">
-            <Benefit title="PREMIUM QUALITY" desc="Finest fabrics and craftsmanship" path="M6 3h12l4 6-10 13L2 9z M2 9h20 M12 22 7 9 M12 22l5-13" />
-            <Benefit title="WIDE RANGE" desc="Menswear, fabrics and accessories" path="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z M3.27 6.96 12 12.01l8.73-5.05 M12 22.08V12" />
-            <Benefit title="CUSTOM TAILORING" desc="Made to your measurements" path="M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M20 4 8.12 15.88 M14.47 14.48 20 20 M8.12 8.12 12 12" />
-            <Benefit title="ORDER ON WHATSAPP" desc="Ask, confirm and order in one chat" path="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-            <Benefit title="IN OUR SHOWROOM" desc="Every piece online is in store today" path="M3 9l9-6 9 6v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10" />
+      {/* 3. HOW WE DRESS ROYALTY + LEGACY (true facts only; see LEGACY below) */}
+      <section className="royal-section" aria-label="How we dress royalty">
+        <div className="container royal-inner">
+          <p className="royal-eyebrow">COUTURE EXPERIENCE</p>
+          <h2 className="royal-title">How we dress royalty</h2>
+          <ol className="royal-list">
+            {[
+              {
+                t: "MAHIB Couture",
+                d: "Our in-house label: hand-embroidered, minutely detailed pieces for the groom.",
+                href: "/mahib",
+                external: false,
+              },
+              {
+                t: "4-Hour Bespoke Stitching",
+                d: "Measured in store and stitched to your fit, the same day.",
+                href: tailoringHref,
+                external: true,
+              },
+              {
+                t: "The Complete Groom Look",
+                d: "Sherwani, safa, mojari and mala, all under one roof.",
+                href: "/shop",
+                external: false,
+              },
+              {
+                t: "For Grooms Abroad",
+                d: "Clients from around the world shop with us. Ask us on WhatsApp.",
+                href: whatsappLink(settings.whatsapp_number, `Hello ${SITE_NAME}, I'm shopping from abroad and have a question.`),
+                external: true,
+              },
+            ].map((row, i) => {
+              const inner = (
+                <>
+                  <span className="royal-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="royal-name">{row.t}</span>
+                  <span className="royal-desc">{row.d}</span>
+                  <span className="royal-arrow" aria-hidden="true">&#8599;</span>
+                </>
+              );
+              return (
+                <li key={row.t}>
+                  {row.external ? (
+                    <a className="royal-row" href={row.href} target="_blank" rel="noopener noreferrer">
+                      {inner}
+                    </a>
+                  ) : (
+                    <Link className="royal-row" href={row.href}>
+                      {inner}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+
+          <div className="legacy-card">
+            <p className="legacy-eyebrow">LEGACY BY NUMBERS</p>
+            <h3 className="legacy-title">{LEGACY.title}</h3>
+            <dl className="legacy-stats">
+              {LEGACY.stats.map((s) => (
+                <div key={s.label}>
+                  <dt>{s.value}</dt>
+                  <dd>{s.label}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       </section>
@@ -278,19 +347,5 @@ export default async function HomePage() {
         </div>
       </section>
     </main>
-  );
-}
-
-function Benefit({ title, desc, path }: { title: string; desc: string; path: string }) {
-  return (
-    <div className="benefit-item">
-      <div className="benefit-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d={path} />
-        </svg>
-      </div>
-      <h4 className="benefit-title">{title}</h4>
-      <p className="benefit-desc">{desc}</p>
-    </div>
   );
 }

@@ -86,7 +86,7 @@ export class FabricStudio {
     this.releasedAt = 0;
     this.cloth.grab(x, y);
     this.cloth.drag(x, y);
-    navigator.vibrate?.(8);
+    buzz(8);
     this.wake();
   }
 
@@ -219,7 +219,7 @@ export class FabricStudio {
       this.onTouch?.();
       this.onTouch = null;
       if (this.zoomTarget === 1) this.cloth.grab(p.x, p.y);
-      navigator.vibrate?.(6);
+      buzz(6);
       this.wake();
     });
     onWin("pointermove", (e) => {
@@ -242,11 +242,18 @@ export class FabricStudio {
       if (this.pointer?.id !== e.pointerId) return;
       this.pointer = null;
       this.releasedAt = performance.now();
+      window.setTimeout(() => this.settle(), 900); // in case animation frames are paused
       this.cloth.release();
       this.wake();
     };
     onWin("pointerup", up);
     onWin("pointercancel", up);
+  }
+
+  private settle() {
+    const f = this.onSettle;
+    this.onSettle = null;
+    f?.();
   }
 
   private clampPan() {
@@ -273,11 +280,7 @@ export class FabricStudio {
     }
 
     // rest when nothing moves (saves battery); the last frame stays on screen
-    if (this.releasedAt && now - this.releasedAt > 750 && this.onSettle) {
-      const f = this.onSettle;
-      this.onSettle = null;
-      f();
-    }
+    if (this.releasedAt && now - this.releasedAt > 750) this.settle();
     if (now - this.active > 1800 && !this.pointer) return;
     this.cloth.step();
     this.draw();
@@ -302,5 +305,14 @@ export class FabricStudio {
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_INT, 0);
+  }
+}
+
+/** A tiny vibration on phones that allow it; never throws. */
+function buzz(ms: number) {
+  try {
+    navigator.vibrate?.(ms);
+  } catch {
+    /* not allowed here */
   }
 }

@@ -217,10 +217,10 @@
 /* ---------- Fabric switched on: woven site + pullable hero ---------- */
 .fabric-btn.on { background: linear-gradient(135deg, #C5A869, #E7D5AA 50%, #B38E46); color: var(--color-espresso); border-color: var(--color-gold-deep); }
 .fabric-btn.on .fabric-btn-spark { fill: var(--color-espresso); }
-.woven-overlay { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 90; pointer-events: none; transition: opacity 0.2s ease; }
+.woven-overlay { position: absolute; z-index: 25; pointer-events: none; transition: opacity 0.2s ease; }
 .woven-on .hero-section { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .woven-on .hero-section img { -webkit-user-drag: none; }
-.hero-cloth { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 30; touch-action: none; transition: opacity 0.3s ease; }
+.hero-cloth { position: absolute; z-index: 30; touch-action: none; transition: opacity 0.3s ease; }
 .hero-cloth-out { opacity: 0; }
 .fabric-toast {
   position: fixed; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 120;

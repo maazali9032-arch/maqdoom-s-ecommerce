@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { FabricStudio } from "@/woven/studio";
@@ -16,10 +17,10 @@ const HOLD_MS = 260;
 const INTERACTIVE = "a,button,input,select,textarea,label,summary,[role=button],[data-woven]";
 
 /**
- * "Feel the Fabric" switch in the header.
- * On: the whole site gets a woven-thread look (drawn over the real page, which stays sharp and
- * clickable), and on the home page you can press and hold the hero, then pull it like cloth.
- * Nothing waits on it: links open instantly and the hero picture is drawn from its own images.
+ * "Feel the Fabric" switch in the header, shown on the home page only.
+ * On: the home hero gets a woven-thread look (drawn over the real content, which stays sharp and
+ * clickable), and you can press and hold the hero, then pull it like cloth. The rest of the site
+ * is untouched. Nothing waits on it: the hero picture is drawn from its own images.
  */
 export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
   const [supported, setSupported] = useState(true);
@@ -27,11 +28,13 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
   const [toast, setToast] = useState(false);
   const [studioOpen, setStudioOpen] = useState(false);
   const overlay = useRef<WovenOverlay | null>(null);
+  const home = usePathname() === "/";
 
   const start = useCallback(async (weave: boolean) => {
     const { WovenOverlay } = await loadOverlay();
-    if (overlay.current) return;
-    overlay.current = new WovenOverlay();
+    const hero = document.getElementById("heroSection");
+    if (overlay.current || !hero) return;
+    overlay.current = new WovenOverlay(hero);
     document.body.classList.add("woven-on");
     if (weave) overlay.current.weaveIn();
     void loadStudio();
@@ -61,10 +64,7 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
       } catch {
         /* storage blocked */
       }
-      if (remembered) {
-        setOn(true);
-        void start(false);
-      }
+      if (remembered) setOn(true);
     }, 0);
     return () => {
       window.clearTimeout(t);
@@ -72,9 +72,26 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
     };
   }, [start, stop]);
 
+  // the woven look lives on the home hero only: add it there, remove it on other pages
+  useEffect(() => {
+    if (!on || !home) {
+      stop();
+      return;
+    }
+    // after moving back to the home page the hero may take a moment to appear
+    let tries = 0;
+    let timer = 0;
+    const attach = () => {
+      if (document.getElementById("heroSection")) void start(false);
+      else if (++tries < 40) timer = window.setTimeout(attach, 100);
+    };
+    attach();
+    return () => window.clearTimeout(timer);
+  }, [on, home, start, stop]);
+
   // home hero: press and hold, then pull it like cloth
   useEffect(() => {
-    if (!on) return;
+    if (!on || !home) return;
     let hold = 0;
     let press: { id: number; x: number; y: number } | null = null;
     let busy = false;
@@ -88,6 +105,7 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
       const hero = document.getElementById("heroSection");
       if (!p || !hero || busy) return;
       busy = true;
+      let made: HTMLCanvasElement | null = null;
       try {
         const [{ snapshotHero }, { FabricStudio }] = await Promise.all([loadSnapshot(), loadStudio()]);
         const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -96,7 +114,10 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
         canvas.className = "hero-cloth";
         canvas.dataset.woven = "";
         canvas.setAttribute("aria-hidden", "true");
-        hero.appendChild(canvas);
+        const { placeOver } = await loadOverlay();
+        placeOver(canvas, hero.getBoundingClientRect());
+        document.body.appendChild(canvas);
+        made = canvas;
         const cloth = new FabricStudio(canvas, { thread: 2.6 });
         cloth.setPicture(pic, "silk");
         cloth.pullFrom(p.id, p.x, p.y);
@@ -118,6 +139,8 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
           }, 320);
         };
       } catch {
+        made?.remove();
+        overlay.current?.setHidden(false);
         busy = false;
       }
       press = null;
@@ -150,7 +173,7 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
       window.removeEventListener("pointercancel", up);
       window.removeEventListener("contextmenu", menu);
     };
-  }, [on]);
+  }, [on, home]);
 
   // the tip hides by itself
   useEffect(() => {
@@ -178,7 +201,7 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
   };
   const closeStudio = useCallback(() => setStudioOpen(false), []);
 
-  if (!supported) return null;
+  if (!supported || !home) return null;
   return (
     <>
       <button

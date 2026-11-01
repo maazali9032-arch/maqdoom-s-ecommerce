@@ -1,6 +1,7 @@
-// Woven look over the live site: a twill thread relief drawn as light/dark tint on top of the
-// real page, which stays sharp, readable and clickable underneath. One flat full-screen pass;
-// it redraws only while scrolling or weaving in, so it costs nothing when the page is still.
+// Woven look over one section (the home hero): a twill thread relief drawn as light/dark tint on
+// top of the real content, which stays sharp, readable and clickable underneath. The canvas is
+// placed over the section from outside it (React owns the section), scrolls with the page, and
+// only redraws when weaving in or resizing.
 
 const VERT = /* glsl */ `#version 300 es
 in vec2 aPos;
@@ -76,10 +77,10 @@ export class WovenOverlay {
   private raf = 0;
   private dirty = true;
   private last = 0;
-  private off: (() => void)[] = [];
+  private ro: ResizeObserver;
   private reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  constructor() {
+  constructor(private host: HTMLElement) {
     const gl = this.canvas.getContext("webgl2", { premultipliedAlpha: false, antialias: false });
     if (!gl) throw new Error("WebGL2 unavailable");
     this.gl = gl;
@@ -112,17 +113,14 @@ export class WovenOverlay {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    const on = <K extends keyof WindowEventMap>(t: K, f: () => void) => {
-      window.addEventListener(t, f, { passive: true });
-      this.off.push(() => window.removeEventListener(t, f));
-    };
-    on("scroll", () => (this.dirty = true));
-    on("resize", () => this.resize());
+    this.ro = new ResizeObserver(() => this.resize());
+    this.ro.observe(host);
+    this.ro.observe(document.body);
     this.resize();
     this.raf = requestAnimationFrame(this.frame);
   }
 
-  /** Weave the screen in from the top (fast; never blocks the page). */
+  /** Weave the section in from the top (fast; never blocks the page). */
   weaveIn() {
     if (this.reduced) return;
     this.front = -4;
@@ -137,16 +135,17 @@ export class WovenOverlay {
 
   destroy() {
     cancelAnimationFrame(this.raf);
-    for (const f of this.off) f();
+    this.ro.disconnect();
     this.canvas.remove();
     this.gl.getExtension("WEBGL_lose_context")?.loseContext();
   }
 
   private resize() {
-    // phones: 1 device pixel per CSS pixel is plenty for 2–3 px threads and keeps scrolling smooth
+    const r = this.host.getBoundingClientRect();
+    placeOver(this.canvas, r);
     this.dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 860 ? 1.25 : 1.5);
-    this.W = window.innerWidth;
-    this.H = window.innerHeight;
+    this.W = Math.max(1, r.width);
+    this.H = Math.max(1, r.height);
     this.canvas.width = Math.round(this.W * this.dpr);
     this.canvas.height = Math.round(this.H * this.dpr);
     this.dirty = true;
@@ -170,11 +169,19 @@ export class WovenOverlay {
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     gl.uniform2f(this.u.uView!, this.W, this.H);
     gl.uniform1f(this.u.uDpr!, this.dpr);
-    gl.uniform1f(this.u.uScroll!, window.scrollY);
+    gl.uniform1f(this.u.uScroll!, 0);
     gl.uniform1f(this.u.uFront!, this.front);
     gl.uniform1f(this.u.uThread!, this.W < 860 ? 2.6 : 2.4);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
+}
+
+/** Put a page-level canvas exactly over an element (absolute, so it scrolls with the page). */
+export function placeOver(el: HTMLElement, r: DOMRect) {
+  el.style.left = `${r.left + window.scrollX}px`;
+  el.style.top = `${r.top + window.scrollY}px`;
+  el.style.width = `${r.width}px`;
+  el.style.height = `${r.height}px`;
 }

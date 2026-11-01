@@ -227,43 +227,63 @@
   .ring .ring-card .category-arrow-circle { width: 30px; height: 30px; }
 }
 
-/* ---------- Home: How we dress royalty + legacy card ---------- */
-.royal-section { background: #fff; padding: clamp(3rem, 7vh, 5.5rem) 0; }
-.royal-inner { max-width: 1120px; }
-.royal-eyebrow { display: flex; align-items: center; gap: 0.5rem; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.2em; color: var(--text-secondary); }
-.royal-eyebrow::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-gold-rich); }
-.royal-title { font-family: var(--font-serif-editorial); font-weight: 500; font-size: clamp(1.9rem, 3.4vw, 2.6rem); color: var(--color-espresso); margin: 0.5rem 0 clamp(1.5rem, 3vh, 2.25rem); }
-.royal-list { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--color-ivory-sand); }
-.royal-list li { border-bottom: 1px solid var(--color-ivory-sand); }
-.royal-row {
-  display: grid; grid-template-columns: 3rem 1fr minmax(0, 15rem) 2.5rem; align-items: center; gap: 1rem;
-  padding: 1.35rem 0.75rem; color: inherit; text-decoration: none; transition: background-color 0.3s ease;
+/* ---------- Home: The Golden Thread (Maqdoom story since 1895) ---------- */
+.gt-section {
+  --p: 0;
+  position: relative; overflow: hidden; color: var(--color-ivory);
+  background: radial-gradient(90% 120% at 50% 0%, #241E18 0%, var(--color-espresso) 62%);
+  padding: clamp(3.5rem, 8vh, 6rem) 0 clamp(3rem, 7vh, 5rem);
+  text-align: center;
 }
-.royal-row:hover { background: var(--color-ivory-warm); }
-.royal-num { font-size: 0.72rem; color: var(--color-gold-rich); letter-spacing: 0.06em; }
-.royal-name { font-family: var(--font-serif-editorial); font-size: clamp(1.25rem, 2vw, 1.6rem); font-weight: 500; color: var(--color-espresso); line-height: 1.2; }
-.royal-desc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45; }
-.royal-arrow {
-  justify-self: end; width: 2.25rem; height: 2.25rem; border-radius: 50%; display: grid; place-items: center;
-  background: var(--color-espresso); color: var(--color-ivory); font-size: 0.85rem; transition: transform 0.3s var(--ease-luxury), background-color 0.3s ease;
-}
-.royal-row:hover .royal-arrow { transform: rotate(45deg); background: var(--color-gold-rich); }
+.gt-eyebrow { font-family: var(--font-serif-display); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.42em; color: var(--color-gold); }
+.gt-title { font-family: var(--font-serif-display); font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 600; letter-spacing: 0.14em; color: var(--color-ivory); margin: 0.6rem 0 0.5rem; }
+.gt-sub { font-family: var(--font-serif-editorial); font-style: italic; font-size: clamp(1.05rem, 1.6vw, 1.3rem); color: var(--text-light-muted); }
 
-.legacy-card {
-  margin-top: clamp(2.5rem, 6vh, 4rem); padding: clamp(1.75rem, 4vw, 2.75rem); border-radius: 18px;
-  background: radial-gradient(120% 140% at 0% 0%, #1E1A16 0%, #0B0908 60%); color: var(--color-ivory);
+.gt-track { position: relative; margin-top: clamp(2.5rem, 6vh, 4rem); }
+.gt-svg { position: absolute; overflow: visible; pointer-events: none; }
+.gt-svg-h { left: 0; right: 0; top: 0; width: 100%; height: 90px; }
+.gt-svg-v { display: none; }
+.gt-svg path { fill: none; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.gt-base { stroke: rgba(197, 168, 105, 0.16); stroke-width: 1.5; stroke-dasharray: 0.012 0.008; }
+.gt-gold {
+  stroke: var(--color-gold); stroke-width: 2.25;
+  stroke-dasharray: 1 1; stroke-dashoffset: calc(1 - var(--p));
+  filter: drop-shadow(0 0 4px rgba(231, 213, 170, 0.55));
 }
-.legacy-eyebrow { display: flex; align-items: center; gap: 0.5rem; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.2em; color: var(--color-gold-light); }
-.legacy-eyebrow::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-gold); }
-.legacy-title { font-family: var(--font-serif-editorial); font-weight: 500; font-size: clamp(1.4rem, 2.6vw, 2rem); line-height: 1.25; max-width: 18ch; margin: 0.6rem 0 clamp(1.75rem, 4vh, 2.5rem); color: var(--color-ivory); }
-.legacy-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; margin: 0; }
-.legacy-stats dt { font-family: var(--font-serif-editorial); font-size: clamp(1.9rem, 3.6vw, 2.8rem); color: var(--color-gold); line-height: 1; }
-.legacy-stats dd { margin: 0.6rem 0 0; font-size: 0.64rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-light-muted); }
+
+.gt-knots { list-style: none; margin: 0; padding: 0; position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.gt-knot { display: flex; justify-content: center; }
+.gt-card {
+  display: flex; flex-direction: column; align-items: center; gap: 0.45rem; max-width: 15rem;
+  color: inherit; text-decoration: none; padding-top: 30px;
+  opacity: 0.18; transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.9s var(--ease-luxury);
+}
+.gt-knot.on .gt-card { opacity: 1; transform: none; }
+.gt-dot {
+  width: 30px; height: 30px; margin-bottom: 1.1rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #F3E3B8, #C5A869 45%, #8E6F32 100%);
+  box-shadow: 0 0 0 6px rgba(197, 168, 105, 0.12), 0 0 18px rgba(231, 213, 170, 0.45);
+  transform: scale(0.4); transition: transform 0.6s var(--ease-luxury) 0.1s;
+}
+.gt-knot.on .gt-dot { transform: scale(1); }
+.gt-mark { font-family: var(--font-serif-display); font-size: clamp(1.6rem, 2.6vw, 2.3rem); font-weight: 600; letter-spacing: 0.06em; color: var(--color-gold-light); line-height: 1; }
+.gt-name { font-family: var(--font-serif-editorial); font-size: 1.25rem; font-style: italic; color: var(--color-ivory); }
+.gt-text { font-size: 0.82rem; line-height: 1.55; color: var(--text-light-muted); }
+.gt-go { margin-top: 0.35rem; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-gold); transition: color 0.3s ease, letter-spacing 0.3s ease; }
+a.gt-card:hover .gt-go { color: var(--color-gold-light); letter-spacing: 0.24em; }
+a.gt-card:hover .gt-mark { color: #fff; }
+
+/* phones: the thread runs down the left and the knots stack */
 @media (max-width: 760px) {
-  .royal-row { grid-template-columns: 2rem 1fr 2.25rem; grid-template-areas: "num name arrow" ". desc arrow"; row-gap: 0.35rem; padding: 1.1rem 0.25rem; }
-  .royal-num { grid-area: num; }
-  .royal-name { grid-area: name; }
-  .royal-desc { grid-area: desc; }
-  .royal-arrow { grid-area: arrow; width: 2rem; height: 2rem; }
-  .legacy-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
+  .gt-section { text-align: left; }
+  .gt-svg-h { display: none; }
+  .gt-svg-v { display: block; left: -6px; top: 0; bottom: 0; width: 40px; height: 100%; }
+  .gt-knots { grid-template-columns: 1fr; gap: 2.25rem; }
+  .gt-knot { justify-content: flex-start; }
+  .gt-card { position: relative; align-items: flex-start; max-width: none; padding: 0 0 0 3.25rem; }
+  .gt-dot { position: absolute; left: 0; top: 0.1rem; width: 26px; height: 26px; margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-card, .gt-dot { transition: none; }
 }

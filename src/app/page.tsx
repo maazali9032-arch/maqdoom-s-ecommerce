@@ -3,6 +3,7 @@ import { getCategories, getHomeFeatured, getSettings, type Category } from "@/li
 import { SITE_NAME, imageUrl, sectionPath, whatsappLink } from "@/lib/site";
 import { HeroCycler } from "@/components/HeroCycler";
 import { CategoryRing } from "@/components/CategoryRing";
+import { GoldenThread } from "@/components/GoldenThread";
 import { HERO_OUTFITS } from "@/lib/hero";
 import { ProductGrid } from "@/components/ProductCard";
 
@@ -19,17 +20,6 @@ function categoryArt(c: Category) {
   const key = `${c.slug} ${c.name}`.toLowerCase();
   return DESIGN_ART.find(([re]) => re.test(key))?.[1] ?? "/images/section_2_fabrics.webp";
 }
-
-/* Legacy facts. Only true numbers go here (to be confirmed by the owner before going live). */
-const LEGACY = {
-  title: "Dressing Hyderabad’s grooms since 1895.",
-  stats: [
-    { value: "1895", label: "Established" },
-    { value: "130+", label: "Years of craftsmanship" },
-    { value: "4 hrs", label: "Made-to-measure stitching" },
-    { value: "Worldwide", label: "Clients from abroad" },
-  ],
-};
 
 const isFabric = (c: Category) => /fabric|thaan/.test(`${c.slug} ${c.name}`.toLowerCase());
 
@@ -135,76 +125,21 @@ export default async function HomePage() {
         </section>
       ) : null}
 
-      {/* 3. HOW WE DRESS ROYALTY + LEGACY (true facts only; see LEGACY below) */}
-      <section className="royal-section" aria-label="How we dress royalty">
-        <div className="container royal-inner">
-          <p className="royal-eyebrow">COUTURE EXPERIENCE</p>
-          <h2 className="royal-title">How we dress royalty</h2>
-          <ol className="royal-list">
-            {[
-              {
-                t: "MAHIB Couture",
-                d: "Our in-house label: hand-embroidered, minutely detailed pieces for the groom.",
-                href: "/mahib",
-                external: false,
-              },
-              {
-                t: "4-Hour Bespoke Stitching",
-                d: "Measured in store and stitched to your fit, the same day.",
-                href: tailoringHref,
-                external: true,
-              },
-              {
-                t: "The Complete Groom Look",
-                d: "Sherwani, safa, mojari and mala, all under one roof.",
-                href: "/shop",
-                external: false,
-              },
-              {
-                t: "For Grooms Abroad",
-                d: "Clients from around the world shop with us. Ask us on WhatsApp.",
-                href: whatsappLink(settings.whatsapp_number, `Hello ${SITE_NAME}, I'm shopping from abroad and have a question.`),
-                external: true,
-              },
-            ].map((row, i) => {
-              const inner = (
-                <>
-                  <span className="royal-num">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="royal-name">{row.t}</span>
-                  <span className="royal-desc">{row.d}</span>
-                  <span className="royal-arrow" aria-hidden="true">&#8599;</span>
-                </>
-              );
-              return (
-                <li key={row.t}>
-                  {row.external ? (
-                    <a className="royal-row" href={row.href} target="_blank" rel="noopener noreferrer">
-                      {inner}
-                    </a>
-                  ) : (
-                    <Link className="royal-row" href={row.href}>
-                      {inner}
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-
-          <div className="legacy-card">
-            <p className="legacy-eyebrow">LEGACY BY NUMBERS</p>
-            <h3 className="legacy-title">{LEGACY.title}</h3>
-            <dl className="legacy-stats">
-              {LEGACY.stats.map((s) => (
-                <div key={s.label}>
-                  <dt>{s.value}</dt>
-                  <dd>{s.label}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </div>
-      </section>
+      {/* 3. THE GOLDEN THREAD: the Maqdoom story since 1895 (same family, confirmed by the owner) */}
+      <GoldenThread
+        knots={[
+          { mark: "1895", title: "Where it began", text: "The Maqdoom family opens its doors in Hyderabad." },
+          { mark: "MAHIB", title: "Couture by hand", text: "Our in-house label: hand-embroidered, minutely detailed pieces.", href: "/mahib" },
+          { mark: "4 HRS", title: "Stitched to you", text: "Measured in store and tailored to your fit, the same day.", href: tailoringHref, external: true },
+          {
+            mark: "WORLDWIDE",
+            title: "Grooms abroad",
+            text: "Clients from around the world shop with us. Ask us on WhatsApp.",
+            href: whatsappLink(settings.whatsapp_number, `Hello ${SITE_NAME}, I'm shopping from abroad and have a question.`),
+            external: true,
+          },
+        ]}
+      />
 
       {/* 4. MAHIB */}
       <section className="mahib-section" id="mahib" aria-label="MAHIB Exclusive Premium Division">

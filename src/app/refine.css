@@ -247,7 +247,6 @@
 .gt-base { stroke: rgba(197, 168, 105, 0.16); stroke-width: 1.5; stroke-dasharray: 0.012 0.008; }
 .gt-gold {
   stroke: var(--color-gold); stroke-width: 2.25;
-  stroke-dasharray: 1 1; stroke-dashoffset: calc(1 - var(--p));
   filter: drop-shadow(0 0 4px rgba(231, 213, 170, 0.55));
 }
 

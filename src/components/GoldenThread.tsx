@@ -30,6 +30,8 @@ export function GoldenThread({ knots }: { knots: ThreadKnot[] }) {
     const items = Array.from(el.querySelectorAll<HTMLElement>(".gt-knot"));
     const dots = items.map((k) => k.querySelector<HTMLElement>(".gt-dot"));
     const track = el.querySelector<HTMLElement>(".gt-track");
+    const revealH = el.querySelector<SVGRectElement>(".gt-reveal-h");
+    const revealV = el.querySelector<SVGRectElement>(".gt-reveal-v");
     const phone = matchMedia("(max-width: 760px)");
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const update = () => {
@@ -58,6 +60,8 @@ export function GoldenThread({ knots }: { knots: ThreadKnot[] }) {
         lit = items.map((_, i) => p >= (i + 0.5) / items.length);
       }
       el.style.setProperty("--p", p.toFixed(4));
+      revealH?.setAttribute("width", (p * 1000).toFixed(1));
+      revealV?.setAttribute("height", (p * 1000).toFixed(1));
       items.forEach((k, i) => k.classList.toggle("on", lit[i]!));
     };
     const onScroll = () => update(); // scroll events already arrive once per frame
@@ -80,13 +84,25 @@ export function GoldenThread({ knots }: { knots: ThreadKnot[] }) {
         <p className="gt-sub">130 years of dressing Hyderabad&rsquo;s grooms, one unbroken thread.</p>
 
         <div className="gt-track">
+          {/* the gold thread is revealed by a clip that grows with the scroll, so what is drawn
+              always matches where the knots light up */}
           <svg className="gt-svg gt-svg-h" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <clipPath id="gt-clip-h">
+                <rect className="gt-reveal-h" x="0" y="-60" width="0" height="220" />
+              </clipPath>
+            </defs>
             <path className="gt-base" d={WAVE} pathLength={1} />
-            <path className="gt-gold" d={WAVE} pathLength={1} />
+            <path className="gt-gold" d={WAVE} clipPath="url(#gt-clip-h)" />
           </svg>
           <svg className="gt-svg gt-svg-v" viewBox="0 0 40 1000" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <clipPath id="gt-clip-v">
+                <rect className="gt-reveal-v" x="-40" y="0" width="120" height="0" />
+              </clipPath>
+            </defs>
             <path className="gt-base" d={WAVE_V} pathLength={1} />
-            <path className="gt-gold" d={WAVE_V} pathLength={1} />
+            <path className="gt-gold" d={WAVE_V} clipPath="url(#gt-clip-v)" />
           </svg>
 
           <ol className="gt-knots">

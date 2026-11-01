@@ -287,3 +287,11 @@ a.gt-card:hover .gt-mark { color: #fff; }
 @media (prefers-reduced-motion: reduce) {
   .gt-card, .gt-dot { transition: none; }
 }
+
+/* ---------- Home: MAHIB, Fabrics and Custom Tailoring a little shorter ---------- */
+.mahib-section { min-height: 520px; }
+.fabrics-section, .tailoring-section { min-height: 470px; }
+.mahib-container, .fabrics-container, .tailoring-container {
+  padding-top: clamp(2.25rem, 4vh, 3.5rem);
+  padding-bottom: clamp(2.25rem, 4vh, 3.5rem);
+}

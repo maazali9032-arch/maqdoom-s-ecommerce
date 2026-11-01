@@ -81,6 +81,7 @@ export default async function HomePage() {
                     fetchPriority={i === 0 ? "high" : "auto"}
                   />
                 ))}
+                <span className="hero-curtain-line" aria-hidden="true" />
               </div>
             </div>
             <div className="hero-editorial-col">

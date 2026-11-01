@@ -294,3 +294,7 @@ a.gt-card:hover .gt-mark { color: #fff; }
   padding-top: clamp(2.25rem, 4vh, 3.5rem);
   padding-bottom: clamp(2.25rem, 4vh, 3.5rem);
 }
+
+/* ---------- Header logo a little smaller ---------- */
+.header-logo-img { height: 46px; }
+@media (max-width: 640px) { .header-logo-img { height: 36px; } }

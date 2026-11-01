@@ -1,5 +1,14 @@
 export const SITE_NAME = "MAQDOOM'S BIG MALL";
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
+/**
+ * The public address of the site, used for share previews (WhatsApp, Google), the sitemap and
+ * canonical links. Set NEXT_PUBLIC_SITE_URL once a custom domain is live; until then Vercel's own
+ * production address is used automatically.
+ */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+  "http://localhost:3000"
+).replace(/\/$/, "");
 
 /** E-commerce photos live in the shared public bucket; grid cards use the small copy. */
 export function imageUrl(path: string | null | undefined, size: "large" | "card" = "large") {

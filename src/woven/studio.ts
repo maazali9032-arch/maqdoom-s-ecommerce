@@ -4,12 +4,10 @@
 // Let go and it springs back.
 
 import { Cloth, FABRICS, type FabricKind } from "./cloth";
-import { Sound } from "./sound";
 import { VERT, FRAG } from "./shaders";
 import { paintSwatch } from "./swatches";
 
 export class FabricStudio {
-  readonly sound = new Sound();
   private gl: WebGL2RenderingContext;
   private prog: WebGLProgram;
   private uniforms = new Map<string, WebGLUniformLocation | null>();
@@ -88,7 +86,6 @@ export class FabricStudio {
     this.releasedAt = 0;
     this.cloth.grab(x, y);
     this.cloth.drag(x, y);
-    this.sound.enable();
     navigator.vibrate?.(8);
     this.wake();
   }
@@ -107,7 +104,6 @@ export class FabricStudio {
     cancelAnimationFrame(this.raf);
     this.ro.disconnect();
     for (const f of this.off) f();
-    this.sound.disable();
     this.gl.getExtension("WEBGL_lose_context")?.loseContext();
   }
 
@@ -220,7 +216,6 @@ export class FabricStudio {
       }
       const p = local(e);
       this.pointer = { id: e.pointerId, ...p };
-      this.sound.enable(); // a tap is the user gesture browsers need for sound
       this.onTouch?.();
       this.onTouch = null;
       if (this.zoomTarget === 1) this.cloth.grab(p.x, p.y);
@@ -231,7 +226,6 @@ export class FabricStudio {
       const p = this.pointer;
       if (!p || p.id !== e.pointerId) return;
       const q = local(e);
-      const moved = Math.hypot(q.x - p.x, q.y - p.y);
       if (this.zoomTarget > 1) {
         // looking closer: drag to move around
         this.panX -= (q.x - p.x) / this.zoom;
@@ -239,7 +233,6 @@ export class FabricStudio {
         this.clampPan();
       } else {
         this.cloth.drag(q.x, q.y);
-        this.sound.rustle(Math.min(1, moved / 25), this.kind === "brocade");
       }
       p.x = q.x;
       p.y = q.y;
@@ -250,7 +243,6 @@ export class FabricStudio {
       this.pointer = null;
       this.releasedAt = performance.now();
       this.cloth.release();
-      this.sound.rustle(0, true);
       this.wake();
     };
     onWin("pointerup", up);

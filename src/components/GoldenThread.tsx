@@ -28,25 +28,45 @@ export function GoldenThread({ knots }: { knots: ThreadKnot[] }) {
     const el = root.current;
     if (!el) return;
     const items = Array.from(el.querySelectorAll<HTMLElement>(".gt-knot"));
+    const dots = items.map((k) => k.querySelector<HTMLElement>(".gt-dot"));
+    const track = el.querySelector<HTMLElement>(".gt-track");
+    const phone = matchMedia("(max-width: 760px)");
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0;
     const update = () => {
-      raf = 0;
-      const r = el.getBoundingClientRect();
+      if (!track) return;
       const vh = window.innerHeight;
-      // 0 when the section's top reaches the lower part of the screen, 1 once most of it has scrolled in
-      const p = reduced ? 1 : Math.min(1, Math.max(0, (vh * 0.9 - r.top) / (r.height * 0.75 + vh * 0.15)));
+      const t = track.getBoundingClientRect();
+      let p: number;
+      let lit: boolean[];
+      if (reduced) {
+        p = 1;
+        lit = items.map(() => true);
+      } else if (phone.matches) {
+        // the thread runs down the page: it is drawn down to a reading line 70% down the screen,
+        // and a knot lights the moment the thread reaches it
+        const line = vh * 0.7;
+        p = Math.min(1, Math.max(0, (line - t.top) / t.height));
+        lit = dots.map((d) => {
+          if (!d) return false;
+          const r = d.getBoundingClientRect();
+          return r.top + r.height / 2 <= line;
+        });
+      } else {
+        // across the page: drawn from left to right while the thread rises from the bottom of the
+        // screen to a little above the middle; knots sit at 1/8, 3/8, 5/8 and 7/8 of the thread
+        p = Math.min(1, Math.max(0, (vh - t.top) / (vh * 0.55)));
+        lit = items.map((_, i) => p >= (i + 0.5) / items.length);
+      }
       el.style.setProperty("--p", p.toFixed(4));
-      items.forEach((k, i) => k.classList.toggle("on", p >= (i + 0.5) / items.length - 0.04));
+      items.forEach((k, i) => k.classList.toggle("on", lit[i]!));
     };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
+    const onScroll = () => update(); // scroll events already arrive once per frame
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    phone.addEventListener("change", onScroll);
     return () => {
-      cancelAnimationFrame(raf);
+      phone.removeEventListener("change", onScroll);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };

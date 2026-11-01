@@ -61,63 +61,6 @@
   .fabric-btn { padding: 0.5rem 0.85rem; font-size: 0.66rem; letter-spacing: 0.1em; }
 }
 
-/* ---------- Feel the Fabric panel ---------- */
-.fabric-panel {
-  position: fixed; inset: 0; z-index: 400; display: flex; flex-direction: column;
-  background: radial-gradient(120% 80% at 50% 0%, #2A2119 0%, #120F0C 70%); color: var(--color-ivory);
-  opacity: 0; transition: opacity 0.3s ease;
-  padding: max(1rem, env(safe-area-inset-top)) clamp(1rem, 4vw, 3rem) max(1rem, env(safe-area-inset-bottom));
-}
-.fabric-panel.shown { opacity: 1; }
-.fabric-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding-bottom: 0.9rem; }
-.fabric-eyebrow { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.24em; color: var(--color-gold); }
-.fabric-title { font-family: var(--font-serif-display); font-size: clamp(1.4rem, 3.4vw, 2.2rem); font-weight: 600; letter-spacing: 0.06em; color: var(--color-gold-light); margin: 0.2rem 0; }
-.fabric-note { font-family: var(--font-serif-editorial); font-style: italic; font-size: 1.05rem; color: var(--text-light-muted); }
-.fabric-close { flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--color-espresso-border); background: rgba(255, 255, 255, 0.04); color: var(--color-ivory); font-size: 1.6rem; line-height: 1; cursor: pointer; }
-.fabric-close:hover { border-color: var(--color-gold); color: var(--color-gold-light); }
-.fabric-stage {
-  position: relative; flex: 1; min-height: 0; border-radius: 10px; overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(197, 168, 105, 0.25);
-}
-.fabric-canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
-.fabric-canvas:active { cursor: grabbing; }
-.fabric-hint {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none;
-  display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.6rem 1rem; border-radius: 999px;
-  background: rgba(18, 15, 12, 0.72); backdrop-filter: blur(6px); color: var(--color-gold-light);
-  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; white-space: nowrap;
-}
-.fabric-hint-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--color-gold); animation: fabric-pulse 1.6s ease-out infinite; }
-@keyframes fabric-pulse { 0% { box-shadow: 0 0 0 0 rgba(197, 168, 105, 0.7); } 100% { box-shadow: 0 0 0 14px rgba(197, 168, 105, 0); } }
-.fabric-failed { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-light-muted); }
-.fabric-closer {
-  position: absolute; right: 0.75rem; bottom: 0.75rem; padding: 0.5rem 0.9rem; border-radius: 999px; cursor: pointer;
-  border: 1px solid rgba(197, 168, 105, 0.6); background: rgba(18, 15, 12, 0.7); color: var(--color-gold-light);
-  font: 600 0.7rem var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; backdrop-filter: blur(6px);
-}
-.fabric-closer.on { background: var(--color-gold); color: var(--color-espresso); }
-.fabric-bottom { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 0.9rem; flex-wrap: wrap; }
-.fabric-swatches { display: flex; gap: 0.5rem; overflow-x: auto; scrollbar-width: none; max-width: 100%; }
-.fabric-swatches::-webkit-scrollbar { display: none; }
-.fabric-swatch {
-  flex: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.85rem 0.45rem 0.45rem; border-radius: 999px; cursor: pointer;
-  border: 1px solid var(--color-espresso-border); background: rgba(255, 255, 255, 0.03); color: var(--text-light-muted);
-  font: 600 0.74rem var(--font-sans); letter-spacing: 0.04em; white-space: nowrap; transition: all var(--transition-fast);
-}
-.fabric-swatch.active { border-color: var(--color-gold); color: var(--color-gold-light); background: rgba(197, 168, 105, 0.12); }
-.fabric-swatch-chip { width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); }
-.fabric-swatch-brocade .fabric-swatch-chip { background: radial-gradient(circle at 50% 45%, #D8B45E 0 28%, #5E1220 30%); }
-.fabric-swatch-silk .fabric-swatch-chip { background: linear-gradient(135deg, #DED5C4, #F1ECE2, #D3C8B4); }
-.fabric-swatch-linen .fabric-swatch-chip { background: repeating-linear-gradient(90deg, #C8BEAA 0 2px, #B5AA95 2px 3px); }
-.fabric-swatch-cotton .fabric-swatch-chip { background: #F1ECE2; }
-.fabric-shop { font-size: 0.74rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-gold-light); white-space: nowrap; }
-.fabric-shop:hover { color: var(--color-ivory); }
-@media (max-width: 640px) {
-  .fabric-note { font-size: 0.95rem; }
-  .fabric-bottom { flex-direction: column; align-items: stretch; gap: 0.75rem; }
-  .fabric-shop { text-align: center; }
-}
-
 /* ---------- Floating WhatsApp button ---------- */
 .wa-float {
   position: fixed; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 95;
@@ -230,7 +173,7 @@
   animation: fabric-toast-in 0.4s var(--ease-luxury);
 }
 .fabric-toast strong { color: var(--color-gold-light); }
-.fabric-toast button {
+.fabric-toast a {
   flex: none; padding: 0.45rem 0.8rem; border-radius: 999px; border: none; cursor: pointer;
   background: var(--color-gold); color: var(--color-espresso); font: 600 0.7rem var(--font-sans); letter-spacing: 0.06em; text-transform: uppercase;
 }

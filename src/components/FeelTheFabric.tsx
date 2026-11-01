@@ -4,10 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import type { FabricStudio } from "@/woven/studio";
 import type { WovenOverlay } from "@/woven/overlay";
-import { SWATCHES } from "@/woven/swatches";
-import type { FabricKind } from "@/woven/cloth";
 
 const loadStudio = () => import("@/woven/studio");
 const loadOverlay = () => import("@/woven/overlay");
@@ -26,7 +23,6 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
   const [supported, setSupported] = useState(true);
   const [on, setOn] = useState(false);
   const [toast, setToast] = useState(false);
-  const [studioOpen, setStudioOpen] = useState(false);
   const overlay = useRef<WovenOverlay | null>(null);
   const home = usePathname() === "/";
 
@@ -199,7 +195,6 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
       setToast(false);
     }
   };
-  const closeStudio = useCallback(() => setStudioOpen(false), []);
 
   if (!supported || !home) return null;
   return (
@@ -225,122 +220,13 @@ export function FeelTheFabric({ fabricsHref }: { fabricsHref: string }) {
               <span>
                 <strong>Woven.</strong> Press and hold the top picture, then pull it.
               </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setToast(false);
-                  setStudioOpen(true);
-                }}
-              >
+              <Link href={fabricsHref} onClick={() => setToast(false)}>
                 Try our fabrics
-              </button>
+              </Link>
             </div>,
             document.body,
           )
         : null}
-      {studioOpen ? createPortal(<FabricPanel fabricsHref={fabricsHref} onClose={closeStudio} />, document.body) : null}
     </>
-  );
-}
-
-/** Full-screen Fabric Studio: brocade, raw silk, linen and cotton to touch and pull. */
-function FabricPanel({ fabricsHref, onClose }: { fabricsHref: string; onClose: () => void }) {
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const studio = useRef<FabricStudio | null>(null);
-  const closeBtn = useRef<HTMLButtonElement>(null);
-  const [kind, setKind] = useState<FabricKind>("brocade");
-  const [closer, setCloser] = useState(false);
-  const [touched, setTouched] = useState(false);
-  const [failed, setFailed] = useState(false);
-  const [shown, setShown] = useState(false);
-
-  useEffect(() => {
-    let alive = true;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeBtn.current?.focus();
-    const raf = requestAnimationFrame(() => setShown(true));
-    void loadStudio()
-      .then(({ FabricStudio }) => {
-        if (!alive || !canvas.current) return;
-        const s = new FabricStudio(canvas.current);
-        s.onTouch = () => setTouched(true);
-        s.setFabric("brocade");
-        studio.current = s;
-      })
-      .catch(() => alive && setFailed(true));
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => {
-      alive = false;
-      cancelAnimationFrame(raf);
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-      studio.current?.destroy();
-      studio.current = null;
-    };
-  }, [onClose]);
-
-  const pick = (k: FabricKind) => {
-    setKind(k);
-    setCloser(false);
-    studio.current?.setCloser(false);
-    studio.current?.setFabric(k);
-  };
-  const toggleCloser = () => {
-    const next = !closer;
-    setCloser(next);
-    studio.current?.setCloser(next);
-  };
-  const current = SWATCHES.find((s) => s.kind === kind)!;
-
-  return (
-    <div className={`fabric-panel${shown ? " shown" : ""}`} role="dialog" aria-modal="true" aria-label="Fabric studio">
-      <div className="fabric-top">
-        <div>
-          <p className="fabric-eyebrow">MAQDOOM&rsquo;S FABRIC STUDIO</p>
-          <h2 className="fabric-title">{current.label}</h2>
-          <p className="fabric-note">{current.note}</p>
-        </div>
-        <button ref={closeBtn} type="button" className="fabric-close" onClick={onClose} aria-label="Close">
-          &times;
-        </button>
-      </div>
-
-      <div className="fabric-stage">
-        <canvas ref={canvas} className="fabric-canvas" aria-label={`${current.label}. Touch and pull the cloth.`} />
-        {!touched && !failed ? (
-          <div className="fabric-hint" aria-hidden="true">
-            <span className="fabric-hint-dot" />
-            {closer ? "Drag to look around" : "Touch and pull the cloth"}
-          </div>
-        ) : null}
-        {failed ? <p className="fabric-failed">The fabric couldn&rsquo;t load on this device.</p> : null}
-        <button type="button" className={`fabric-closer${closer ? " on" : ""}`} onClick={toggleCloser}>
-          {closer ? "Step back" : "Look closer"}
-        </button>
-      </div>
-
-      <div className="fabric-bottom">
-        <div className="fabric-swatches" role="radiogroup" aria-label="Choose a fabric">
-          {SWATCHES.map((s) => (
-            <button
-              key={s.kind}
-              type="button"
-              role="radio"
-              aria-checked={s.kind === kind}
-              className={`fabric-swatch fabric-swatch-${s.kind}${s.kind === kind ? " active" : ""}`}
-              onClick={() => pick(s.kind)}
-            >
-              <span className="fabric-swatch-chip" aria-hidden="true" />
-              {s.label}
-            </button>
-          ))}
-        </div>
-        <Link href={fabricsHref} className="fabric-shop" onClick={onClose}>
-          Shop our fabrics &rarr;
-        </Link>
-      </div>
-    </div>
   );
 }

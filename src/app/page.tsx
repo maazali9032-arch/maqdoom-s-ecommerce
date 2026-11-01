@@ -81,7 +81,9 @@ export default async function HomePage() {
                     fetchPriority={i === 0 ? "high" : "auto"}
                   />
                 ))}
-                <span className="hero-curtain-line" aria-hidden="true" />
+                {/* gold edge of the curtain: the same cutout, tinted gold, shown only as a thin band */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="model-outfit curtain-glow" src={HERO_OUTFITS[0].src} alt="" aria-hidden="true" />
               </div>
             </div>
             <div className="hero-editorial-col">

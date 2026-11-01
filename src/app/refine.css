@@ -96,18 +96,17 @@
 @keyframes curtain-in { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes curtain-out { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 100% 0); } }
 
-/* the gold hem of the curtain, rising with the reveal */
-.hero-curtain-line {
-  position: absolute; left: -6%; right: -6%; bottom: 0; height: 2px; z-index: 3; pointer-events: none; opacity: 0;
-  background: linear-gradient(90deg, transparent, #E7D5AA 18%, #C5A869 50%, #E7D5AA 82%, transparent);
-  box-shadow: 0 0 14px 3px rgba(231, 213, 170, 0.55), 0 0 2px rgba(255, 255, 255, 0.9);
+/* the gold hem of the curtain: the new outfit's own cutout tinted gold, shown as a thin band that
+   rises with the reveal, so the glow follows the person's outline and never the photo's box */
+.model-outfit.curtain-glow {
+  z-index: 3; pointer-events: none; opacity: 0;
+  filter: brightness(0) invert(1) sepia(1) saturate(3.2) hue-rotate(-8deg) brightness(1.02) drop-shadow(0 0 5px rgba(231, 213, 170, 0.95));
 }
-.hero-curtain-line.run { animation: curtain-line var(--curtain-ms, 1100ms) cubic-bezier(0.65, 0, 0.35, 1) both; }
-@keyframes curtain-line {
-  0% { bottom: 0; opacity: 0; }
-  8% { opacity: 1; }
-  88% { opacity: 1; }
-  100% { bottom: 100%; opacity: 0; }
+.model-outfit.curtain-glow.run { opacity: 1; animation: curtain-band var(--curtain-ms, 1100ms) cubic-bezier(0.65, 0, 0.35, 1) both; }
+@keyframes curtain-band {
+  0% { clip-path: inset(100% 0 -1% 0); opacity: 1; }
+  92% { opacity: 1; }
+  100% { clip-path: inset(-1% 0 100% 0); opacity: 0; }
 }
 
 /* the same placement for every state (desktop and phone) */
@@ -130,7 +129,7 @@
   .model-outfit[src*="hero_section_person_d_1.4"] { translate: -8px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .model-outfit.active.reveal, .model-outfit.leaving, .hero-curtain-line.run { animation-duration: 1ms; }
+  .model-outfit.active.reveal, .model-outfit.leaving, .curtain-glow.run { animation-duration: 1ms; }
 }
 /* the active number shows a thin line filling until the next outfit */
 .page-num.active::after { transform-origin: left; }

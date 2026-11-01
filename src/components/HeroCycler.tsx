@@ -34,16 +34,18 @@ export function HeroCycler() {
     const from = prev.current;
     prev.current = index;
     if (from === index) return; // first paint: show the first outfit as it is, no animation
-    document.querySelectorAll<HTMLImageElement>(".model-outfit").forEach((img, i) => {
+    document.querySelectorAll<HTMLImageElement>(".model-outfit:not(.curtain-glow)").forEach((img, i) => {
       img.classList.remove("active", "reveal", "leaving");
       if (i === index) img.classList.add("active", "reveal");
       else if (i === from) img.classList.add("leaving");
     });
-    const line = document.querySelector<HTMLElement>(".hero-curtain-line");
-    if (line) {
-      line.classList.remove("run");
-      void line.offsetWidth; // restart the animation
-      line.classList.add("run");
+    // the gold edge follows the new outfit's own outline
+    const glow = document.querySelector<HTMLImageElement>(".curtain-glow");
+    if (glow) {
+      glow.classList.remove("run");
+      glow.src = OUTFITS[index]!.src;
+      void glow.offsetWidth; // restart the animation
+      glow.classList.add("run");
     }
   }, [index]);
 

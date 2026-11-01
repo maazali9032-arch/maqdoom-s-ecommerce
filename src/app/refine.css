@@ -202,9 +202,9 @@
 
 /* ---------- Home categories: 3D showroom ring ---------- */
 .ring-stage {
-  --ring-card: 270px;
+  --ring-card: clamp(230px, 19vw, 300px);
   position: relative; height: calc(var(--ring-card) * 1.62 + 40px); margin-top: 0.5rem;
-  perspective: 1600px; perspective-origin: 50% 40%;
+  perspective: 1800px; perspective-origin: 50% 40%;
   touch-action: pan-y; user-select: none; -webkit-user-select: none; cursor: grab;
 }
 .ring-stage:active { cursor: grabbing; }

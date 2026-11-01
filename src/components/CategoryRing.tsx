@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 export type RingCard = { href: string; name: string; img: string; desc?: string | null };
 
-const MIN_CARDS = 6; // fewer categories are repeated so the ring stays full
+const MIN_CARDS = 12; // categories are repeated so the wide ring always looks full
 const SPEED = 9; // degrees per second when turning by itself
 
 /**
@@ -34,28 +34,35 @@ export function CategoryRing({ cards }: { cards: RingCard[] }) {
     let raf = 0;
     let last = performance.now();
     let visible = true;
-    let radius = 0;
+    let rx = 0; // half-width of the oval: reaches the edges of the section
+    let rz = 0; // depth of the oval
 
     const layout = () => {
       const w = els[0]?.offsetWidth ?? 260;
-      radius = Math.round((w + 34) / (2 * Math.tan(Math.PI / n)));
-      els.forEach((el, i) => {
-        el.style.transform = `rotateY(${i * step}deg) translateZ(${radius}px)`;
-      });
+      const half = st.clientWidth / 2;
+      // the nearest side cards end just inside the section's edges
+      const side = Math.sin((Math.max(step, 60) * Math.PI) / 180);
+      // ...and neighbours never overlap the front card (on phones they run off the screen edges)
+      const apart = (w * 1.04) / Math.sin((step * Math.PI) / 180);
+      rx = Math.max(w * 0.9, (half - w * 0.55) / side, apart);
+      rz = Math.min(rx * 0.6, 420);
     };
 
     const paint = () => {
-      rg.style.transform = `translateZ(${-radius}px) rotateY(${-angle}deg)`;
       els.forEach((el, i) => {
-        let rel = (((i * step - angle) % 360) + 540) % 360 - 180; // -180..180, 0 = front
-        rel = Math.abs(rel);
-        const facing = Math.cos((rel * Math.PI) / 180); // 1 front, -1 back
+        const rel = (((i * step - angle) % 360) + 540) % 360 - 180; // -180..180, 0 = front
+        const rad = (rel * Math.PI) / 180;
+        const facing = Math.cos(rad); // 1 front, -1 back
+        // an oval as wide as the section: cards spread to the edges and turn to face the middle
+        const x = rx * Math.sin(rad);
+        const z = rz * (facing - 1);
+        el.style.transform = `translate3d(${x.toFixed(1)}px, 0, ${z.toFixed(1)}px) rotateY(${(rel * 0.55).toFixed(2)}deg)`;
         const k = (facing + 1) / 2;
-        el.style.opacity = String(0.18 + 0.82 * k * k);
+        el.style.opacity = String(0.12 + 0.88 * k * k);
         // darken with an overlay (a CSS filter here blacks out photos inside the 3D ring)
-        el.style.setProperty("--shade", (0.55 * (1 - k)).toFixed(3));
+        el.style.setProperty("--shade", (0.6 * (1 - k)).toFixed(3));
         el.style.pointerEvents = facing > 0.3 ? "auto" : "none";
-        el.classList.toggle("ring-front", rel < step / 2);
+        el.classList.toggle("ring-front", Math.abs(rel) < step / 2);
       });
     };
 

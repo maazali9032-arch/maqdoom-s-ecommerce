@@ -199,3 +199,29 @@
 @media (max-width: 640px) {
   .fabric-toast { border-radius: 14px; flex-direction: column; align-items: stretch; text-align: center; gap: 0.55rem; padding: 0.8rem; width: calc(100vw - 2rem); bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
+
+/* ---------- Home categories: endless sliding loop ---------- */
+.categories-carousel-wrap.cat-loop {
+  overflow: hidden; scroll-snap-type: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+}
+.cat-loop-track {
+  gap: 0 !important; width: max-content; min-width: 0;
+  animation: cat-loop var(--cat-dur, 36s) linear infinite;
+  will-change: transform;
+}
+/* spacing as a right margin, so both copies are exactly the same width and the loop never jumps */
+.cat-loop-track .category-card { margin-right: 22px; scroll-snap-align: none; }
+.cat-loop:hover .cat-loop-track,
+.cat-loop:focus-within .cat-loop-track,
+.cat-loop:active .cat-loop-track { animation-play-state: paused; }
+@keyframes cat-loop { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 768px) {
+  .cat-loop-track .category-card { margin-right: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .categories-carousel-wrap.cat-loop { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .cat-loop-track { animation: none; }
+  .cat-loop-track .category-card[aria-hidden="true"] { display: none; }
+}
